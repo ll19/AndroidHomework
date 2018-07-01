@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_aichat" default="compile.module.aichat">
+  <dirname property="module.aichat.basedir" file="${ant.file.module_aichat}"/>
+  
+  <property name="module.jdk.home.aichat" value="${jdk.home.1.8}"/>
+  <property name="module.jdk.bin.aichat" value="${jdk.bin.1.8}"/>
+  <property name="module.jdk.classpath.aichat" value="jdk.classpath.1.8"/>
+  
+  <property name="compiler.args.aichat" value="-encoding UTF-8 -source 1.7 -target 1.7 ${compiler.args}"/>
+  
+  <property name="aichat.output.dir" value="${module.aichat.basedir}/build/classes/production/AIChat"/>
+  <property name="aichat.testoutput.dir" value="${module.aichat.basedir}/build/classes/test/AIChat"/>
+  
+  <path id="aichat.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="aichat.module.production.classpath">
+    <path refid="${module.jdk.classpath.aichat}"/>
+  </path>
+  
+  <path id="aichat.runtime.production.module.classpath">
+    <pathelement location="${aichat.output.dir}"/>
+  </path>
+  
+  <path id="aichat.module.classpath">
+    <path refid="${module.jdk.classpath.aichat}"/>
+    <pathelement location="${aichat.output.dir}"/>
+  </path>
+  
+  <path id="aichat.runtime.module.classpath">
+    <pathelement location="${aichat.testoutput.dir}"/>
+    <pathelement location="${aichat.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.aichat">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.aichat">
+    <patternset refid="excluded.from.module.aichat"/>
+  </patternset>
+  
+  <path id="aichat.module.sourcepath">
+    <dirset dir="${module.aichat.basedir}">
+      <include name="app/src/test/java"/>
+      <include name="app/src/androidTest/java"/>
+      <include name="app/src/main/java"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.aichat" depends="compile.module.aichat.production,compile.module.aichat.tests" description="Compile module AIChat"/>
+  
+  <target name="compile.module.aichat.production" depends="register.custom.compilers" description="Compile module AIChat; production classes">
+    <mkdir dir="${aichat.output.dir}"/>
+    <javac2 destdir="${aichat.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.aichat}/javac">
+      <compilerarg line="${compiler.args.aichat}"/>
+      <bootclasspath refid="aichat.module.bootclasspath"/>
+      <classpath refid="aichat.module.production.classpath"/>
+      <src refid="aichat.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.aichat"/>
+    </javac2>
+    
+    <copy todir="${aichat.output.dir}">
+      <fileset dir="${module.aichat.basedir}/app/src/test/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.aichat.basedir}/app/src/androidTest/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.aichat.basedir}/app/src/main/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.aichat.tests" depends="register.custom.compilers,compile.module.aichat.production" description="compile module AIChat; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.aichat" description="cleanup module">
+    <delete dir="${aichat.output.dir}"/>
+    <delete dir="${aichat.testoutput.dir}"/>
+  </target>
+</project>
